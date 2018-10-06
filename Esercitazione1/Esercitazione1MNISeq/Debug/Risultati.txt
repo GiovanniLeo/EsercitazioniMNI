@@ -1,0 +1,48 @@
+Elapsed time:0.002962
+sum:1000000
+Elapsed time:0.003039
+sum:1000000
+Elapsed time:0.002877
+sum:1000000
+Dimensione problema 1 x 1000000
+--------------------------------
+Elapsed time:0.005847
+sum:2000000
+Elapsed time:0.005874
+sum:2000000
+Elapsed time:0.005884
+sum:2000000
+Dimensione problema 2 x 1000000
+--------------------------------
+Elapsed time:0.009028
+sum:3000000
+Elapsed time:0.008935
+sum:3000000
+Elapsed time:0.008937
+sum:3000000
+Dimensione problema 4 x 1000000
+--------------------------------
+Elapsed time:0.021678
+sum:4000000
+Elapsed time:0.022722
+sum:4000000
+Elapsed time:0.020295
+sum:4000000
+Dimensione problema 8 x 1000000
+--------------------------------
+Elapsed time:0.022432
+sum:5000000
+Elapsed time:0.021617
+sum:5000000
+Elapsed time:0.025749
+sum:5000000
+Dimensione problema 16 x 1000000
+--------------------------------
+Elapsed time:0.018611
+sum:6000000
+Elapsed time:0.018615
+sum:6000000
+Elapsed time:0.024475
+sum:6000000
+Dimensione problema 32 x 1000000
+--------------------------------
