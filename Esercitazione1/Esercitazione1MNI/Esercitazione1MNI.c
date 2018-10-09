@@ -51,22 +51,21 @@ int main (int argc, char**argv)
 
 	}
 	//End work partitioning
+
+	//logarithm operation using bitwise
+	int itereation = 0, p = numP;
+	while(p!=1)
+	{
+		p = p >> 1;
+		itereation++;
+	}
+
 	double startTime = MPI_Wtime();
 	long partialSum = 0,recivedPartialSum = 0;
 
 	for(i = start ; i <= stop; i++)
 	{
 		partialSum += array[i];
-	}
-
-
-	int itereation = 0, p = numP;
-
-	//logarithm operation using bitwise
-	while(p!=1)
-	{
-		p = p >> 1;
-		itereation++;
 	}
 
 
@@ -105,11 +104,14 @@ int main (int argc, char**argv)
 
 	}
 	double endTime = MPI_Wtime();
+	double elapsed = endTime-startTime;
+	double max;
+	MPI_Reduce(&elapsed,&max,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
 	if (rank == 0)
 	{
 
-		printf("Elapsed time %lf\n",endTime-startTime);
+		printf("Elapsed time %lf\n",max);
 		printf("===================================\n");
 		printf("Partial Sum %ld\n",partialSum);
 

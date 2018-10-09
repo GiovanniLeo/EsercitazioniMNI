@@ -101,13 +101,16 @@ int main (int argc, char**argv)
 
 	}
 	double endTime = MPI_Wtime();
+	double elapsed = endTime-startTime;
+	double max;
+	MPI_Reduce(&elapsed,&max,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
 	if (rank == 0)
 	{
 
-		printf("Elapsed time %lf\n",endTime-startTime);
+		printf("Elapsed time %lf\n",max);
 		printf("===================================\n");
-		printf("Partial Sum %lf, rank %d\n",partialSum,rank);
+		printf("Partial Sum %lf\n",partialSum);
 
 	}
 	//MPI End
