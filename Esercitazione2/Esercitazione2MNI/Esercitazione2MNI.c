@@ -3,7 +3,7 @@
  Name        : Esercitazione2MNI
  Author      : Giovanni Leo
  Number      : 0522500538
- Description :Esercitazione2MNI
+ Description : Esercitazione2MNI
  ============================================================================
  */
 
@@ -39,8 +39,10 @@ int main (int argc, char* argv[])
 
 	//Vettore a cui si deve moltiplicare la matrice
 	double* x = (double*)malloc(sizeof(double)*cols);
+	//Vettore risultato
 	double* y = (double*)malloc(sizeof(double)*cols);
 	double* localY;
+
 
 	sendCount = (int*)malloc(sizeof(int)*numP);
 	displacements = (int*)malloc(sizeof(int)*numP);
@@ -53,10 +55,10 @@ int main (int argc, char* argv[])
 	int i = 0,sum = 0;
 
 	/**
-	 * Creare un array di chuck in base al resto ed un array di displacement al
-	 *  fine di trovare gli elementi della matrice tali array servono alla scatterv
-	 *  la quale in base al processore andrà a recuperare l'indice e valore in send count e displacement
-	 *  in modo tale da prebndere i giusti valori nell'array
+	 * Creare un array di chuck in base al resto ed un array di displacements al
+	 *  fine di trovare gli elementi della matrice, tali array servono alla scatterv
+	 *  la quale in base al processore andrà a recuperare l'indice e valore in sendCount e displacements
+	 *  in modo tale da prendere i giusti valori nell'array
 	 */
 	for ( i = 0; i < numP; i++) {
 		sendCount[i] = rowsChunck;
@@ -69,7 +71,7 @@ int main (int argc, char* argv[])
 		sum += sendCount[i];
 	}
 
-	//printf("rank = %d, send count = %d, displacement = %d\n", rank, sendCount[rank],displacements[rank]);
+
 	recivedBuffer = setMatrixSpace(sendCount[rank], cols);
 	localY = setMatrixSpace(sendCount[rank], cols);
 
@@ -87,16 +89,19 @@ int main (int argc, char* argv[])
 			for(j = 0; j < cols ; j++)
 			{
 				matrixSetElement(A, rows, cols, i, j,1);
-				//printf("%lf ", matrixGetElement(A, rows, cols, i, j) );
 			}
-			//printf("\n");
 		}
 	}
 
+	//Distrubuzione della matrice
+	//Il recivecount cambia in base al rank
 	MPI_Scatterv(&A[0],sendCount,displacements,MPI_DOUBLE,&recivedBuffer[0],sendCount[rank],MPI_DOUBLE,0,MPI_COMM_WORLD);
 
-
+	//Calcolo prodotto
 	matVetProduct(localY, recivedBuffer, sendCount[rank], cols, x);
+
+	//Si mette tutto insieme
+	//Il sendbuff cambia in base al rank
 	MPI_Gatherv(localY,sendCount[rank],MPI_DOUBLE,y,sendCount,displacements,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
 

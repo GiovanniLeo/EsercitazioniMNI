@@ -60,7 +60,8 @@ int main (int argc, char**argv)
 	}
 
 	int itereation = 0, p = numP;
-	/*Operazione di logaritmo in base due del numero di processori*/
+
+	//logarithm operation using bitwise
 	while(p!=1)
 	{
 		p = p >> 1;
@@ -80,11 +81,10 @@ int main (int argc, char**argv)
 		}
 		else
 		{
-			temp =(2 << i); //Equivale a 2^i, nell alg sul quaderno equivale a 2^(k+1)
-			dist = temp >>1; //Equivale a 2^i/2, nell alg sul quaderno equivale a 2^(k)
+			temp =(2 << i); //is equivalent to 2^i,in the pseudocode is equivalent to 2^(k+1)
+			dist = temp >>1; //is equivalent to 2^i/2, in the pseudocode is equivalent to 2^(k)
 		}
-		//ho calcolato dist facendo prima una moltiplicazione e poi una divisione
-		//equivale a (2^i)/2
+		//Computed dist doing first a multiplication and then a division is equivalent to (2^i)/2
 
 		if((rank%temp) == 0)
 		{
