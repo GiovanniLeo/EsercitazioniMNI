@@ -6,7 +6,8 @@
  Description : Esercitazione2MNIParte2, l'idea è quella di fare la trapossta
  della matrice e dividerla nello stesso modo della seconda strategia e poi
  una volta inviata si rifà la trasposta al fine di calcolare il prodotto
- matrice vettore.
+ matrice vettore. In questo caso vengolo trattate le matrici rettangolari
+ le quali devono avaere un numero di colonne pari.
  ============================================================================
  */
 
@@ -32,82 +33,136 @@ int main (int argc, char* argv[])
 
 	int cols,rows;
 	cols = atoi(argv[1]);
-	//rows = atoi(argv[2]);
-	rows = cols;
+	rows = atoi(argv[2]);
+
+	int* sendCountX = (int*)malloc(sizeof(int)*numP);
+	int* displacementsX = (int*)malloc(sizeof(int)*numP);
+	int* sendCountA = (int*)malloc(sizeof(int)*numP);
+	int* displacementsA = (int*)malloc(sizeof(int)*numP);
+	int sendCountCol = 0;
 	int N = rows*cols;
 	int chunck = N/numP;
-	int xChunck = rows/numP;
-	int startA,startX;
-	int* localA = (int*)malloc(sizeof(int)*chunck);
-	int* localX = (int*)malloc(sizeof(int)*xChunck);
+	int xChunck = cols/numP;
+	int colChunck = cols/numP;
+	int matrixRemainder = fmod(N,numP);
+	int xRemainder = fmod(cols,numP);
+	int colReminder =  fmod(cols,numP);
+	int* localA;
+	int* localX;
 	int* localY = (int*)malloc(sizeof(int)*(rows));
 	int* y = (int*)malloc(sizeof(int)*(rows));
-	int* A;
-	int* x;
+	int* A = (int *)malloc(sizeof(int)*N);
+	int* x = (int *)malloc(sizeof(int)*cols);
 
 
-	if(rank == 0)
-	{
+	int i = 0,sumX = 0,sumA = 0;
 
-		A = (int *)malloc(sizeof(int)*N);
-		x = (int *)malloc(sizeof(int)*rows);
-		int i,j;
-		for(i = 0; i < (cols*rows); i++)
-		{
-			A[i] = i + 1;
+	for ( i = 0; i < numP; i++) {
+		sendCountA[i] = chunck;
+		if (matrixRemainder > 0) {
+			sendCountA[i]++;
+			matrixRemainder--;
 		}
 
-		for(i = 0; i < rows; i++)
-		{
-			x[i] = 1;
+
+		displacementsA[i] = sumA;
+		sumA += sendCountA[i];
+	}
+
+
+
+	for ( i = 0; i < numP; i++) {
+		sendCountX[i] = xChunck;
+		if (xRemainder > 0) {
+			sendCountX[i]++;
+			xRemainder--;
 		}
 
-		for(i = 0;i< cols;i++)
+
+		displacementsX[i] = sumX;
+		sumX += sendCountX[i];
+	}
+
+	for ( i = 0; i < numP; i++) {
+		sendCountCol = colChunck;
+		if (colReminder > 0) {
+			sendCountCol ++;
+			colReminder--;
+		}
+
+
+		localX = (int*)malloc(sizeof(int)*sendCountX[rank]);
+		localA = (int*)malloc(sizeof(int)*sendCountA[rank]);
+
+		if(rank == 0)
 		{
-			for(j=0;j<rows;j++)
+
+			int i,j;
+			for(i = 0; i < (cols*rows); i++)
 			{
-				printf("%d ",matrixGetElement(A, rows, cols, j, i));
+				A[i] = i + 1;
 			}
-			printf("\n");
 
+			for(i = 0; i < cols; i++)
+			{
+				x[i] = 1;
+			}
+
+			for(i = 0;i< rows;i++)
+			{
+				for(j=0;j<cols;j++)
+				{
+					printf("%d ",matrixGetElement(A, rows, cols, j, i));
+				}
+				printf("\n");
+
+			}
+			traspose(A, rows, cols);
 		}
 
-		traspose(A, rows, cols);
-	}
+		MPI_Scatterv(&A[0],sendCountA,displacementsA,MPI_INT,&localA[0],sendCountA[rank],MPI_INT,0,MPI_COMM_WORLD);
+		MPI_Scatterv(&x[0],sendCountX,displacementsX,MPI_INT,&localX[0],sendCountX[rank],MPI_INT,0,MPI_COMM_WORLD);
 
 
-	MPI_Scatter(&x[0], xChunck, MPI_INT,&localX[0], xChunck, MPI_INT,0, MPI_COMM_WORLD);
-	MPI_Scatter(&A[0], chunck, MPI_INT,&localA[0], chunck, MPI_INT,0, MPI_COMM_WORLD);
+		printf("%d div  send count %d\n",sendCountA[rank],sendCountX[rank]);
+		traspose(localA, sendCountX[rank], rows);
+		matVetProduct(localY, localA, rows,  sendCountX[rank], localX);
 
-	traspose(localA, cols/numP, rows);
-	matVetProduct(localY, localA, rows, cols/numP, localX);
-
-	MPI_Reduce(&localY[0],&y[0],rows,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
-
-
-	if(rank == 0)
-	{
-		int i;
-
-		for(i = 0; i < (cols); i++)
+		for(i = 0; i < (rows); i++)
 		{
-			printf("%d \n",y[i]);
+			//printf("%d ",localY[i]);
+
+		}
+		printf("\n");
+
+		MPI_Reduce(&localY[0],&y[0],rows,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+
+
+		if(rank == 0)
+		{
+			int i;
+
+			for(i = 0; i < (rows); i++)
+			{
+				printf("%d \n",y[i]);
+
+			}
 
 		}
 
+
+
+
+
+
+
+
+		MPI_Finalize();
+		return 0;
+
 	}
-
-
-
-
-
-
-
-
-	MPI_Finalize();
-	return 0;
-
 }
+
 /**
  * A tale funzione si passa la mtrice che si vule traposrre
  * in forma di array e il numero di colonne e di righe della matrice
