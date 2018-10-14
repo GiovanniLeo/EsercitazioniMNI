@@ -3,16 +3,17 @@
  Name        : Esercitazione2MNIParte2
  Author      : Giovanni Leo
  Number      : 0522500538
- Description : Prodotto mat vet sequenziale interi
+ Description : prodotto mat vet sequenziale double
  ============================================================================
  */
 
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include "mpi.h"
 
-int matrixGetElement(int* A, int ROWS, int COLS, int r, int c);
-void matVetProduct(int y[], int *a, int ROWS, int COLS, int x[]);
+double matrixGetElement(double* A, int ROWS, int COLS, int r, int c);
+void matVetProduct(double y[], double *a, int ROWS, int COLS, double x[]);
 
 int main (int argc, char* argv[])
 {
@@ -31,24 +32,27 @@ int main (int argc, char* argv[])
 
 
 	int N = rows*cols;
-	int* y = (int*)malloc(sizeof(int)*(rows));
-	int* A = (int *)malloc(sizeof(int)*N);
-	int* x = (int *)malloc(sizeof(int)*cols);
+	double* y = (double*)malloc(sizeof(double)*(rows));
+	double* A = (double *)malloc(sizeof(double)*N);
+	double* x = (double *)malloc(sizeof(double)*cols);
 
 
 	int i ,j;
 
 
-	for(i = 0; i < (cols*rows); i++)
+	for (i=0;i<rows;i++)
 	{
-		A[i] = i + 1;
-	}
+		x[i]= i;
+		for(j=0;j<cols;j++)
+		{
+			if (j==0)
+				A[(i * cols) + j] = (1.0/(i+1))-1;
+			else
+				A[(i * cols) + j] = (1.0/(i+1))-(pow(1.0/2.0,j));
 
-	for(i = 0; i < cols; i++)
-	{
-		x[i] = 1;
-	}
+		}
 
+	}
 
 
 
@@ -84,7 +88,7 @@ int main (int argc, char* argv[])
 		{
 			for(i = 0; i < (rows); i++)
 			{
-				printf("%d \n",y[i]);
+				printf("%lf \n",y[i]);
 
 			}
 		}
@@ -106,12 +110,12 @@ int main (int argc, char* argv[])
  * r     riga dell'elemento da prelevare
  * c     colonna dell'elemento da prelevare
  */
-int matrixGetElement(int* A, int ROWS, int COLS, int r, int c)
+double matrixGetElement(double* A, int ROWS, int COLS, int r, int c)
 {
 	return A[ (c * COLS) + r ];
 }
 
-void matVetProduct(int y[], int *a, int ROWS, int COLS, int x[])
+void matVetProduct(double y[], double *a, int ROWS, int COLS, double x[])
 {
 	int i, j;
 
