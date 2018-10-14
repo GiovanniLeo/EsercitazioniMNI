@@ -30,8 +30,8 @@ int main (int argc, char* argv[])
 	MPI_Comm_size(MPI_COMM_WORLD,&numP);
 
 	int cols,rows;
-	cols = atoi(argv[1]);
-	rows = atoi(argv[2]);
+	cols = atoi(argv[1])*1000;
+	rows = cols;
 
 	int N = rows*cols;
 	int* y = (int*)malloc(sizeof(int)*(rows));
@@ -51,15 +51,19 @@ int main (int argc, char* argv[])
 		x[i] = 1;
 	}
 
-	for(i = 0;i< rows;i++)
+	if(rows < 10 && cols < 10)
 	{
-		for(j=0;j<cols;j++)
+		for(i = 0;i< rows;i++)
 		{
-			printf("%d ",matrixGetElement(A, rows, cols, j, i));
-		}
-		printf("\n");
+			for(j=0;j<cols;j++)
+			{
+				printf("%d ",matrixGetElement(A, rows, cols, j, i));
+			}
+			printf("\n");
 
+		}
 	}
+
 
 	double startTime = MPI_Wtime();
 
@@ -72,12 +76,16 @@ int main (int argc, char* argv[])
 	if(rank == 0)
 	{
 		int i;
-
-		for(i = 0; i < (rows); i++)
+		if(rows < 10 && cols < 10)
 		{
-			printf("%d \n",y[i]);
+			for(i = 0; i < (rows); i++)
+			{
+				printf("%d \n",y[i]);
 
+			}
 		}
+
+		printf("Elapsed %lf \n",elapsed);
 
 	}
 

@@ -31,7 +31,7 @@ int main (int argc, char* argv[])
 	MPI_Comm_size(MPI_COMM_WORLD,&numP);
 
 	int cols,rows;
-	cols = atoi(argv[1]);
+	cols = atoi(argv[1]) * 1000;
 	//rows = atoi(argv[2]);
 	rows = cols;
 	int N = rows*cols;
@@ -62,14 +62,18 @@ int main (int argc, char* argv[])
 			x[i] = 1;
 		}
 
-		for(i = 0;i< cols;i++)
+		if(rows < 10 && cols < 10)
 		{
-			for(j=0;j<rows;j++)
-			{
-				printf("%d ",matrixGetElement(A, rows, cols, j, i));
-			}
-			printf("\n");
 
+			for(i = 0;i< cols;i++)
+			{
+				for(j=0;j<rows;j++)
+				{
+					printf("%d ",matrixGetElement(A, rows, cols, j, i));
+				}
+				printf("\n");
+
+			}
 		}
 
 		traspose(A, rows, cols);
@@ -80,20 +84,30 @@ int main (int argc, char* argv[])
 	MPI_Scatter(&A[0], chunck, MPI_INT,&localA[0], chunck, MPI_INT,0, MPI_COMM_WORLD);
 
 	traspose(localA, cols/numP, rows);
+
+	double startTime = MPI_Wtime();
 	matVetProduct(localY, localA, rows, cols/numP, localX);
+	double endTime = MPI_Wtime();
 
 	MPI_Reduce(&localY[0],&y[0],rows,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
 
+	double elapsed = endTime-startTime;
+	double max;
+	MPI_Reduce(&elapsed,&max,1,MPI_DOUBLE,MPI_MAX,0,MPI_COMM_WORLD);
 
 	if(rank == 0)
 	{
 		int i;
 
-		for(i = 0; i < (cols); i++)
+		if(rows < 10 && cols < 10)
 		{
-			printf("%d \n",y[i]);
+			for(i = 0; i < (cols); i++)
+			{
+				printf("%d \n",y[i]);
 
+			}
 		}
+		printf("Elasped %lf\n",max);
 
 	}
 
