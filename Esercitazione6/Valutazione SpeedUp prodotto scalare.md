@@ -25,13 +25,13 @@ $$
 $$
 Stiamo utilizzando meno blocchi di quanti ne abbiamo a disposizione ma tale scelta è stata fatta per problemi di memoria.
 
-| Nx1000 | Tempi CPU | Tempi GPU | SpeedUp |
-| ------ | --------- | --------- | ------- |
-| 128    | 0,4996    | 0,8970    | 0,55    |
-| 192    | 0,7135    | 1,1065    | 0,64    |
-| 256    | 0,9576    | 1,3928    | 0,68    |
-| 448    | 1,6649    | 2,2319    | 0,74    |
-| 512    | 1,9004    | 2,4114    | 0,78    |
+| Nx1000 | Tempi CPU | Tempi GPU | SpeedUp     |
+| ------ | --------- | --------- | ----------- |
+| 128    | 0,4996    | 0,3448    | 1,44 |
+| 192    | 0,7135    | 0,5186    | 1,37        |
+| 256    | 0,9576    | 0,8412    | 1,13        |
+| 448    | 1,6649    | 1,3006    | 1,28        |
+| 512    | 1,9004    | 1,46      | 1,30        |
 
 Inoltre il programma `Esercitazione6Punto1.cu`utilizza 10 registri quindi il numero di registri utilizzati sarà:$1536*10 = 15360 < 32768.$
 
@@ -46,11 +46,11 @@ Stiamo utilizzando meno blocchi di quanti ne abbiamo a disposizione ma tale scel
 
 | Nx1000 | Tempi CPU | Tempi GPU | SpeedUp |
 | ------ | --------- | --------- | ------- |
-| 128    | 0,4996    | 0,0845    | 5,91    |
-| 192    | 0,7135    | 0,1310    | 5,44    |
-| 256    | 0,9576    | 0,1576    | 6,07    |
-| 448    | 1,6649    | 0,2659    | 6,26    |
-| 512    | 1,9004    | 0,3008    | 6,31    |
+| 128    | 0,4996    | 0,0989    | 5,05    |
+| 192    | 0,7135    | 0,1258    | 5,67    |
+| 256    | 0,9576    | 0,1617    | 5,92    |
+| 448    | 1,6649    | 0,2832    | 5,87    |
+| 512    | 1,9004    | 0,3199    | 5,94    |
 
 Inoltre il programma `Esercitazione6Punto2.cu`utilizza 10 registri quindi il numero di registri utilizzati sarà:$1536*10 = 15360 < 32768$.
 
@@ -64,11 +64,11 @@ Stiamo utilizzando meno blocchi di quanti ne abbiamo a disposizione ma tale scel
 
 | Nx1000 | Tempi CPU | Tempi GPU | SpeedUp |
 | ------ | --------- | --------- | ------- |
-| 128    | 0,4996    | 0,0443    | 11,27   |
-| 192    | 0,7135    | 0,0612    | 11,65   |
-| 256    | 0,9576    | 0,0788    | 12,15   |
-| 448    | 1,6649    | 0,1255    | 13,26   |
-| 512    | 1,9004    | 0,1426    | 13,32   |
+| 128    | 0,4996    | 0,0480    | 10,40   |
+| 192    | 0,7135    | 0,0660    | 10,81   |
+| 256    | 0,9576    | 0,0826    | 11,59   |
+| 448    | 1,6649    | 0,1320    | 12,61   |
+| 512    | 1,9004    | 0,1594    | 11,92   |
 
 Inoltre il programma `Esercitazione6Punto3.cu`utilizza 10 registri quindi il numero di registri utilizzati sarà:$1536*10 = 15360 < 32768$.
 

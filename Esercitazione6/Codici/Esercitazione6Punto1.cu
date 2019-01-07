@@ -1,5 +1,5 @@
-#define VS
-//#define MGPU
+//#define VS
+#define MGPU
 
 #ifdef VS
 #include "cuda_runtime.h"
@@ -32,7 +32,7 @@ int main()
 	int size, N, productCPU = 0,productGPU = 0, i;
 	dim3 gridDim, blockDim;
 	cudaEvent_t start, stop;
-	float elapsed;
+	float elapsed, elapsedCPU,elapsedGPU;
 
 
 	printf("Inserisci la size degli array(N):");
@@ -43,16 +43,16 @@ int main()
 	fflush(stdout);
 	scanf("%d", &blockDim.x);
 
-	//Determino il numero esatto di blocchi 
+	//Determino il numero esatto di blocchi
 	gridDim.x = N / blockDim.x + ((N % blockDim.x) == 0 ? 0 : 1);
-	
+
 	size = N * sizeof(int);
 
 #ifdef DEBUG
 	printf("Size della matrice: %d\n", N);
 	printf("Numero totale di blocchi: %d\n", gridDim.x);
 	printf("Numero totale dei Thread per blocco: %d\n", blockDim.x);
-#endif 
+#endif
 
 	//Alloco la memoria sull' host
 	aHost = (int*)malloc(size);
@@ -74,7 +74,7 @@ int main()
 #ifdef DEBUG
 	printArray(aHost, N);
 	printArray(bHost, N);
-#endif 
+#endif
 
 	//copio i dati dall'host al device
 	cudaMemcpy(aDevice, aHost, size, cudaMemcpyHostToDevice);
@@ -86,27 +86,38 @@ int main()
 	cudaEventRecord(start, 0);
 
 	scalarProductv1GPU << <gridDim, blockDim >> > (aDevice, bDevice, cDevice, N);
-	cudaMemcpy(rHost, cDevice, size, cudaMemcpyDeviceToHost);
+
 	cudaEventRecord(stop, 0);
 	cudaEventSynchronize(stop);
-	
-	for ( i = 0; i < N; i++)
-	{
-		productGPU += rHost[i];
-	}
-	
+	cudaEventElapsedTime(&elapsedGPU, start, stop);
 
-	cudaEventElapsedTime(&elapsed, start, stop);
 	//De-allocazione eventi
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
 
-	printf("Tempo per prodotto scalare GPU:%f ms\n", elapsed);
+	cudaMemcpy(rHost, cDevice, size, cudaMemcpyDeviceToHost);
+
+
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+	cudaEventRecord(start, 0);
+
+	for ( i = 0; i < N; i++)
+	{
+		productGPU += rHost[i];
+	}
+
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+	cudaEventElapsedTime(&elapsedCPU, start, stop);
+
+	printf("Tempo per prodotto scalare GPU:%f ms\n", elapsedGPU + elapsedCPU);
 
 	//Somma Seriale
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
 	cudaEventRecord(start, 0);
+
 
 	productCPU = scalarProductCPU(aHost, bHost, N);
 	cudaEventRecord(stop, 0);
@@ -118,8 +129,8 @@ int main()
 	cudaEventDestroy(stop);
 
 	printf("Tempo per prodotto scalare CPU:%f ms\n", elapsed);
-	//fare il metodo di controllo controllo 
-	
+	//fare il metodo di controllo controllo
+
 	printf("Prodotto scalare CPU: %d\n",productCPU);
 	printf("Prodotto scalare GPU: %d\n", productGPU);
 
@@ -163,14 +174,14 @@ __global__ void scalarProductv1GPU(int *a, int*b, int *c, int N)
 	if (id < N)
 	{
 
-		c[id] = a[id] * b[id];		
+		c[id] = a[id] * b[id];
 	}
 }
 
 int scalarProductCPU(int *a, int*b, int N)
 {
 	int i,product = 0;
-	
+
 	for ( i = 0; i < N; i++)
 	{
 		product += a[i] * b[i];
@@ -178,5 +189,3 @@ int scalarProductCPU(int *a, int*b, int N)
 
 	return product;
 }
-
-
